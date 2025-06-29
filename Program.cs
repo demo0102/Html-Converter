@@ -16,11 +16,39 @@ class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
+        // --- 诊断代码开始 ---
+        // 无论有没有参数，都显示诊断信息并暂停
+        Console.WriteLine("--- DIAGNOSTIC MODE ---");
+        Console.WriteLine($"Current Working Directory: {Directory.GetCurrentDirectory()}");
+        Console.WriteLine($"Received {args.Length} argument(s).");
+
+        if (args.Length > 0)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                Console.WriteLine($"args[{i}] = \"{args[i]}\"");
+            }
+            string joinedArgs = string.Join(" ", args);
+            Console.WriteLine($"Joined args path attempt = \"{joinedArgs}\"");
+        }
+        else
+        {
+            Console.WriteLine("No arguments received.");
+        }
+
+        Console.WriteLine("-------------------------");
+        Console.WriteLine("Please take a screenshot of this window and send it back.");
+        Console.WriteLine("Press any key to continue to the main program logic...");
+        Console.ReadKey();
+        // --- 诊断代码结束 ---
+
         // 获取输入路径
         string filePath = GetFilePath(args);
         if (!File.Exists(filePath))
         {
             Console.WriteLine("文件不存在，请检查路径是否正确");
+            // 为诊断添加暂停
+            Console.ReadKey();
             return;
         }
 

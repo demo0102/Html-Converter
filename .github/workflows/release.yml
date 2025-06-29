@@ -29,7 +29,7 @@ jobs:
 
       # 步骤 3: 发布应用程序 (依赖框架并极限压缩体积)
       - name: Publish application
-        run: dotnet publish ./Html-Converter/Html-Converter.csproj -c Release -r ${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }} --self-contained false -p:PublishSingleFile=true -p:PublishTrimmed=true -p:InvariantGlobalization=true
+        run: dotnet publish ./Html-Converter.csproj -c Release -r ${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }} --self-contained false -p:PublishSingleFile=true -p:PublishTrimmed=true -p:InvariantGlobalization=true
         
       # 步骤 4: 打包生成物
       - name: Package artifacts

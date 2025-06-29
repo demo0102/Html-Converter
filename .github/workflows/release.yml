@@ -1,5 +1,5 @@
 # 工作流名称
-name: .NET Compact Release Publisher
+name: .NET Release Publisher
 
 # 触发条件
 on:
@@ -23,8 +23,9 @@ jobs:
         with:
           dotnet-version: 8.0.x 
 
+      # 【修改点 1】改回独立部署并开启代码裁剪优化
       - name: Publish application
-        run: dotnet publish ./Html-Converter.csproj -c Release -r ${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }} --self-contained false -p:PublishSingleFile=true -p:InvariantGlobalization=true
+        run: dotnet publish ./Html-Converter.csproj -c Release -r ${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }} --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:InvariantGlobalization=true
         
       - name: Package artifacts
         run: |
@@ -38,22 +39,23 @@ jobs:
           fi
         shell: bash
 
-      # 修正并合并为一个上传步骤
       - name: Upload Final Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-artifact-${{ matrix.os }}
-          # 这个语法会尝试匹配两种文件类型，哪个存在就上传哪个
           path: |
             Html-Converter-*.zip
             Html-Converter-*.tar.gz
-          # 修正了参数名，并设置为 error，因为此时如果一个文件都找不到，说明打包出错了
           if-no-files-found: error
 
-  # 发布任务 (保持不变)
+  # 发布任务
   release:
     needs: build
     runs-on: ubuntu-latest
+    
+    # 【修改点 2】为发布任务授予写入权限
+    permissions:
+      contents: write
 
     steps:
       - name: Download all artifacts

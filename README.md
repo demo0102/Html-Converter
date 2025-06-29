@@ -8,14 +8,6 @@
 
 ## 如何使用
 
-### 1. 准备环境 (首次使用)
-
-本工具依赖 .NET 运行时。请根据你的操作系统，前往微软官网下载并安装 **.NET 8.0 Desktop Runtime**。
-
-- [**点击这里下载 .NET 8.0 Runtime**](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)
-
-### 2. 下载与使用
-
 1.  **下载** -> 前往 [**Releases**](https://github.com/demo0102/Html-Converter/releases) 页面下载最新程序。
 
 2.  **转换** -> 将 `.html` 文件**拖拽**到 `Html-Converter.exe` 上并根据提示选择模式。

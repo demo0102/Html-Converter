@@ -1,0 +1,75 @@
+# 工作流名称
+name: .NET Compact Release Publisher
+
+# 触发条件：当一个新标签 (tag) 被推送到仓库时触发
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*' # 匹配 v1.0.0, v1.2.3 等版本标签
+
+jobs:
+  # 构建任务
+  build:
+    # 在三个不同的操作系统上并行运行
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # 步骤 1: 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 步骤 2: 安装 .NET 环境 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x 
+
+      # 步骤 3: 发布应用程序 (依赖框架并极限压缩体积)
+      - name: Publish application
+        run: dotnet publish ./Html-Converter/Html-Converter.csproj -c Release -r ${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }} --self-contained false -p:PublishSingleFile=true -p:PublishTrimmed=true -p:InvariantGlobalization=true
+        
+      # 步骤 4: 打包生成物
+      - name: Package artifacts
+        run: |
+          ARTIFACT_NAME="Html-Converter-${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }}"
+          PUBLISH_DIR="./Html-Converter/bin/Release/net8.0/${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }}/publish"
+          
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            7z a "${ARTIFACT_NAME}.zip" "${PUBLISH_DIR}/Html-Converter.exe"
+          else
+            tar -czvf "${ARTIFACT_NAME}.tar.gz" -C "${PUBLISH_DIR}" "Html-Converter"
+          fi
+        shell: bash
+
+      # 步骤 5: 上传打包好的文件
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact-${{ matrix.os }}
+          path: Html-Converter-*.zip
+          path-if-no-files: ignore
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact-${{ matrix.os }} 
+          path: Html-Converter-*.tar.gz
+          path-if-no-files: ignore
+
+  # 发布任务
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*/*.*

@@ -92,7 +92,8 @@ class Program
     {
         if (args.Length > 0)
         {
-            return args[0].Trim('"'); // 处理带空格的路径
+            // 将所有传入的参数用空格重新拼接，以正确处理未被引号包裹的带空格路径
+            return string.Join(" ", args).Trim('"');
         }
 
         Console.Write("请拖入HTML文件或输入路径：");

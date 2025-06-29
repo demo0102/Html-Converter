@@ -16,104 +16,37 @@ class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        // --- 诊断代码开始 ---
-        // 无论有没有参数，都显示诊断信息并暂停
-        Console.WriteLine("--- DIAGNOSTIC MODE ---");
-        Console.WriteLine($"Current Working Directory: {Directory.GetCurrentDirectory()}");
-        Console.WriteLine($"Received {args.Length} argument(s).");
+        // --- 侦探代码开始 ---
+        Console.WriteLine("--- macOS Drag-and-Drop Detective ---");
+        Console.WriteLine();
+        Console.WriteLine($"Current Working Directory is: {Directory.GetCurrentDirectory()}");
+        Console.WriteLine();
+        Console.WriteLine($"Received {args.Length} argument(s):");
 
         if (args.Length > 0)
         {
             for (int i = 0; i < args.Length; i++)
             {
-                Console.WriteLine($"args[{i}] = \"{args[i]}\"");
+                // 打印每一个参数的原始内容，不带任何处理
+                Console.WriteLine($"  args[{i}] = \"{args[i]}\"");
             }
-            string joinedArgs = string.Join(" ", args);
-            Console.WriteLine($"Joined args path attempt = \"{joinedArgs}\"");
         }
         else
         {
-            Console.WriteLine("No arguments received.");
+            Console.WriteLine("  (No arguments were received)");
         }
 
-        Console.WriteLine("-------------------------");
-        Console.WriteLine("Please take a screenshot of this window and send it back.");
-        Console.WriteLine("Press any key to continue to the main program logic...");
+        Console.WriteLine();
+        Console.WriteLine("---------------------------------------");
+        Console.WriteLine("This is the end of the diagnostic report.");
+        Console.WriteLine("Please take a screenshot of this entire window and send it back.");
+        Console.WriteLine();
+        Console.WriteLine("Press any key to close the window...");
         Console.ReadKey();
-        // --- 诊断代码结束 ---
+        // --- 侦探代码结束 ---
 
-        // 获取输入路径
-        string filePath = GetFilePath(args);
-        if (!File.Exists(filePath))
-        {
-            Console.WriteLine("文件不存在，请检查路径是否正确");
-            // 为诊断添加暂停
-            Console.ReadKey();
-            return;
-        }
-
-        // 验证文件后缀
-        if (!IsValidHtmlFile(filePath))
-        {
-            Console.WriteLine("错误：只支持HTML文件（.html 或 .htm 后缀）");
-            Console.WriteLine("按任意键退出...");
-            Console.ReadKey();
-            return;
-        }
-
-        // 选择转换模式
-        ConversionMode mode = GetConversionMode();
-
-        try
-        {
-            // 读取文件
-            string html = File.ReadAllText(filePath, Encoding.UTF8);
-
-            // 转换处理
-            string result;
-            string extension;
-
-            if (mode == ConversionMode.Markdown)
-            {
-                result = ConvertHtmlToMarkdown(html);
-                extension = ".md";
-            }
-            else
-            {
-                result = ConvertHtmlToBBCode(html);
-                extension = ".bbcode";
-            }
-
-            // 生成输出路径
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(filePath) ?? "",
-                $"{Path.GetFileNameWithoutExtension(filePath)}{extension}"
-            );
-
-            // 保存文件
-            File.WriteAllText(outputPath, result, Encoding.UTF8);
-            Console.WriteLine($"转换完成！输出文件：{outputPath}");
-
-            // 询问是否复制到剪贴板
-            if (AskToCopyToClipboard())
-            {
-                if (CopyToClipboard(result))
-                {
-                    Console.WriteLine("✓ 内容已复制到剪贴板");
-                }
-                else
-                {
-                    Console.WriteLine("✗ 复制到剪贴板失败");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"处理出错：{ex.Message}");
-        }
-
-        Console.WriteLine("按任意键退出...");
-        Console.ReadKey();
+        // 我们暂时让程序在这里结束，不执行后面的逻辑，以避免任何干扰
+        return;
     }
 
     static string GetFilePath(string[] args)

@@ -16,49 +16,101 @@ class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        // --- 侦探代码开始 ---
-        Console.WriteLine("--- macOS Drag-and-Drop Detective ---");
-        Console.WriteLine();
-        Console.WriteLine($"Current Working Directory is: {Directory.GetCurrentDirectory()}");
-        Console.WriteLine();
-        Console.WriteLine($"Received {args.Length} argument(s):");
-
-        if (args.Length > 0)
+        // 获取输入路径
+        string filePath = GetFilePath(args);
+        if (!File.Exists(filePath))
         {
-            for (int i = 0; i < args.Length; i++)
+            Console.WriteLine("文件不存在，请检查路径是否正确");
+            return;
+        }
+
+        // 验证文件后缀
+        if (!IsValidHtmlFile(filePath))
+        {
+            Console.WriteLine("错误：只支持HTML文件（.html 或 .htm 后缀）");
+            Console.WriteLine("按任意键退出...");
+            Console.ReadKey();
+            return;
+        }
+
+        // 选择转换模式
+        ConversionMode mode = GetConversionMode();
+
+        try
+        {
+            // 读取文件
+            string html = File.ReadAllText(filePath, Encoding.UTF8);
+
+            // 转换处理
+            string result;
+            string extension;
+
+            if (mode == ConversionMode.Markdown)
             {
-                // 打印每一个参数的原始内容，不带任何处理
-                Console.WriteLine($"  args[{i}] = \"{args[i]}\"");
+                result = ConvertHtmlToMarkdown(html);
+                extension = ".md";
+            }
+            else
+            {
+                result = ConvertHtmlToBBCode(html);
+                extension = ".bbcode";
+            }
+
+            // 生成输出路径
+            string outputPath = Path.Combine(
+                Path.GetDirectoryName(filePath) ?? "",
+                $"{Path.GetFileNameWithoutExtension(filePath)}{extension}"
+            );
+
+            // 保存文件
+            File.WriteAllText(outputPath, result, Encoding.UTF8);
+            Console.WriteLine($"转换完成！输出文件：{outputPath}");
+
+            // 询问是否复制到剪贴板
+            if (AskToCopyToClipboard())
+            {
+                if (CopyToClipboard(result))
+                {
+                    Console.WriteLine("✓ 内容已复制到剪贴板");
+                }
+                else
+                {
+                    Console.WriteLine("✗ 复制到剪贴板失败");
+                }
             }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("  (No arguments were received)");
+            Console.WriteLine($"处理出错：{ex.Message}");
         }
 
-        Console.WriteLine();
-        Console.WriteLine("---------------------------------------");
-        Console.WriteLine("This is the end of the diagnostic report.");
-        Console.WriteLine("Please take a screenshot of this entire window and send it back.");
-        Console.WriteLine();
-        Console.WriteLine("Press any key to close the window...");
+        Console.WriteLine("按任意键退出...");
         Console.ReadKey();
-        // --- 侦探代码结束 ---
-
-        // 我们暂时让程序在这里结束，不执行后面的逻辑，以避免任何干扰
-        return;
     }
 
     static string GetFilePath(string[] args)
     {
-        if (args.Length > 0)
+        // 优先处理通过命令行参数传入的路径
+        if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
         {
-            // 将所有传入的参数用空格重新拼接，以正确处理未被引号包裹的带空格路径
-            return string.Join(" ", args).Trim('"');
+            return args[0].Trim('"'); // 处理带引号的路径
         }
 
-        Console.Write("请拖入HTML文件或输入路径：");
-        return Console.ReadLine()?.Trim('"') ?? "";
+        // 如果没有命令行参数，则循环提示用户输入，直到获得非空路径
+        string filePath;
+        do
+        {
+            Console.Write("请拖入HTML文件或输入路径：");
+            filePath = Console.ReadLine()?.Trim('"') ?? ""; // 读取并去除可能存在的引号
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                Console.WriteLine("路径不能为空，请重新输入。"); // 对空输入给出提示
+            }
+
+        } while (string.IsNullOrWhiteSpace(filePath)); // 只要输入为空，就继续循环
+
+        return filePath;
     }
 
     static bool IsValidHtmlFile(string filePath)

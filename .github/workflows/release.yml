@@ -35,7 +35,7 @@ jobs:
       - name: Package artifacts
         run: |
           ARTIFACT_NAME="Html-Converter-${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }}"
-          PUBLISH_DIR="./Html-Converter/bin/Release/net8.0/${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }}/publish"
+          PUBLISH_DIR="./bin/Release/net8.0/${{ matrix.os == 'windows-latest' && 'win-x64' || (matrix.os == 'ubuntu-latest' && 'linux-x64' || 'osx-x64') }}/publish"
           
           if [ "${{ matrix.os }}" == "windows-latest" ]; then
             7z a "${ARTIFACT_NAME}.zip" "${PUBLISH_DIR}/Html-Converter.exe"

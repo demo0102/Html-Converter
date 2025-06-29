@@ -8,7 +8,7 @@
 
 ## 如何使用
 
-1.  **下载** -> 前往 [**Releases**](https://github.com/demo0102/Html-Converter/releases) 页面下载最新程序。
+1.  **下载** -> 前往 [**Releases**](https://github.com/vcb-s/Html-Converter/releases) 页面下载最新程序。
 
 2.  **转换文件** -\> 您可以通过以下任意一种方式来指定需要转换的 HTML 文件：
 

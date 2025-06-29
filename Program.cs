@@ -101,7 +101,7 @@ class Program
         do
         {
             Console.Write("请拖入HTML文件或输入路径：");
-            filePath = Console.ReadLine()?.Trim('"') ?? ""; // 读取并去除可能存在的引号
+            filePath = Console.ReadLine()?.Trim().Trim('"') ?? ""; // 先用 Trim() 移除所有前后空白，再用 Trim('"') 移除前后可能存在的引号
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
